@@ -6,6 +6,7 @@ from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtGui import QMouseEvent, QPainter
 from PySide6.QtWidgets import QApplication, QMenu, QWidget
 
+from .animation import Animator
 from .sprite import Sprite
 
 
@@ -25,6 +26,8 @@ class ToyWindow(QWidget):
         self.sprite = Sprite(sprite_name)
         self.setFixedSize(*self.sprite.size())
 
+        self.animator = Animator(self)
+
         self._dragging = False
         self._drag_offset = QPoint()
         self._press_pos = QPoint()
@@ -35,6 +38,11 @@ class ToyWindow(QWidget):
         self._timer.timeout.connect(self._tick)
         self._timer.start(16)
 
+        self._hour_timer = QTimer(self)
+        self._hour_timer.timeout.connect(self._on_hour)
+        self._hour_timer.start(60 * 60 * 1000)
+        self._on_hour()
+
         screen = QApplication.primaryScreen().availableGeometry()
         self.move(
             screen.width() - self.width() - 20,
@@ -42,6 +50,15 @@ class ToyWindow(QWidget):
         )
 
         self.show()
+
+    def _on_hour(self) -> None:
+        """Check the time and switch to the appropriate ambient state."""
+        new_state = self.sprite.ambient_state()
+        old_state = self.sprite.default_state
+        if new_state != old_state:
+            self.sprite.default_state = new_state
+            if self.sprite.state == old_state:
+                self.sprite.set_state(new_state)
 
     def _tick(self) -> None:
         now = time.monotonic()

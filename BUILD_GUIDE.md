@@ -100,11 +100,27 @@ Create a `sprite.json` next to your PNGs. Here is a full annotated example:
 | `states.<name>.frames` | Ordered list of PNG filenames for that state. |
 | `states.<name>.loop` | `true` to loop forever, `false` to play once then return to `default_state`. |
 | `states.<name>.fps` | Optional; overrides the global `fps` for this state only. |
+| `time_states` | Optional map of state name → list of hours (0–23). The pet automatically switches to that state when the hour changes. |
 | `statics.base` | Optional background layer. |
 | `statics.overlay` | Optional foreground layer. |
 | `statics.<layer>.image` | PNG filename. |
 | `statics.<layer>.x` | Horizontal offset in pixels. |
 | `statics.<layer>.y` | Vertical offset in pixels. |
+
+### Time-aware behavior
+
+If you add `time_states` to `sprite.json`, the toy checks the current hour every 60 minutes and switches to the matching state. A missing or unmapped hour falls back to `default_state`.
+
+Example:
+
+```json
+"time_states": {
+  "sleep": [22, 23, 0, 1, 2, 3, 4, 5, 6],
+  "nap": [13, 14]
+}
+```
+
+With that mapping the pet sleeps from 10 PM to 6 AM, takes an afternoon nap from 1 PM to 2 PM, and stays `idle` the rest of the day. Clicking still triggers the `happy` reaction; when `happy` finishes the pet returns to the current time-based state.
 
 ## 3. Test your sprite
 

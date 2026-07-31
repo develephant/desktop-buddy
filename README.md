@@ -8,6 +8,7 @@ A drop-in sprite desktop pal built with PySide6. Add your own PNG frames to a sp
 - Drag the toy around the desktop
 - Click to trigger a reaction animation
 - Animated states plus static base/overlay layers
+- Time-aware ambient states (idle, sleep, nap) that update every hour
 - Right-click menu to exit
 - `--sprite <name>` argument to swap sprite sets
 
@@ -31,7 +32,7 @@ uv run desktop-buddy --sprite my_pet
 See [BUILD_GUIDE.md](BUILD_GUIDE.md) for the full guide, including:
 
 - How to draw frames and static layers
-- The `sprite.json` format
+- The `sprite.json` format, including `time_states`
 - Testing your sprite
 - Packaging a standalone Windows `.exe` with PyInstaller
 
@@ -52,7 +53,9 @@ desktop-buddy/
 │           ├── base.png
 │           ├── overlay.png
 │           ├── idle_*.png
-│           └── happy_*.png
+│           ├── happy_*.png
+│           ├── sleep_*.png
+│           └── nap_*.png
 └── README.md
 ```
 

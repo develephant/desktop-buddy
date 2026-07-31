@@ -1,5 +1,6 @@
 import json
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +23,6 @@ class Sprite:
 
         self.width = int(self._manifest.get("width", 128))
         self.height = int(self._manifest.get("height", 128))
-        self.default_state = self._manifest.get("default_state", "idle")
         self.global_fps = float(self._manifest.get("fps", 8))
 
         self.states: dict[str, dict[str, Any]] = {}
@@ -42,6 +42,19 @@ class Sprite:
 
         if not self.frames:
             raise ValueError("No valid animation states found in sprite.json")
+
+        self._first_state = next(iter(self.frames))
+        fallback = self._manifest.get("default_state", "idle")
+        self._fallback_state = fallback if fallback in self.frames else self._first_state
+        self.default_state = self._fallback_state
+
+        self._time_table: dict[int, str] = {}
+        for state_name, hours in self._manifest.get("time_states", {}).items():
+            if state_name not in self.frames:
+                continue
+            for h in hours:
+                if isinstance(h, int) and 0 <= h <= 23:
+                    self._time_table[h] = state_name
 
         self.statics: dict[str, dict[str, Any]] = {}
         for layer in ("base", "overlay"):
@@ -65,10 +78,18 @@ class Sprite:
     def state(self) -> str:
         return self._state
 
+    def _resolve(self, name: str) -> str:
+        if name in self.frames:
+            return name
+        return self._fallback_state if self._fallback_state in self.frames else self._first_state
+
+    def ambient_state(self) -> str:
+        """Return the state the pet should be in based on the current hour."""
+        hour = datetime.now().hour
+        return self._time_table.get(hour, self._fallback_state)
+
     def set_state(self, name: str) -> None:
-        if name not in self.frames:
-            name = self.default_state
-        self._state = name
+        self._state = self._resolve(name)
         self._frame_index = 0
         self._accumulator = 0.0
 
@@ -111,7 +132,7 @@ class Sprite:
                     self._frame_index = 0
                 else:
                     self._frame_index = 0
-                    self._state = self.default_state
+                    self._state = self._resolve(self.default_state)
                     break
 
     def reset(self) -> None:
