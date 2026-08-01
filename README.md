@@ -32,10 +32,20 @@ uv run desktop-buddy --sprite my_pet
 
 See [BUILD_GUIDE.md](BUILD_GUIDE.md) for the full guide, including:
 
-- How to draw frames and static layers
+- The Create-A-Buddy Studio, an optional Gradio app for drawing frames and exporting a sprite from a browser UI
+- How to draw frames and static layers by hand
 - The `sprite.json` format, including `time_states`
 - Testing your sprite
 - Packaging a standalone Windows `.exe` with PyInstaller
+
+### Create-A-Buddy Studio
+
+A separate, optional app for building sprites without leaving the browser:
+
+```powershell
+uv sync --extra studio
+uv run desktop-buddy-studio
+```
 
 ## Project layout
 
@@ -48,6 +58,7 @@ desktop-buddy/
 │   ├── __init__.py
 │   ├── main.py          # window, input, app loop
 │   ├── sprite.py        # manifest loader + animation driver
+│   ├── studio/          # optional Gradio app: Create-A-Buddy Studio
 │   └── sprites/
 │       └── default/     # default placeholder sprite
 │           ├── sprite.json
