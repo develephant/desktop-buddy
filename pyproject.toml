@@ -11,7 +11,7 @@ dependencies = [
 
 [project.optional-dependencies]
 studio = [
-    "gradio>=5",
+    "gradio>=6.22",
     "pillow>=10",
 ]
 
