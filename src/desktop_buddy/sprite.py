@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from PySide6.QtCore import QPoint
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QTransform
 
 
 class Sprite:
@@ -27,6 +27,7 @@ class Sprite:
 
         self.states: dict[str, dict[str, Any]] = {}
         self.frames: dict[str, list[QPixmap]] = {}
+        self._mirrored_frames: dict[str, list[QPixmap | None]] = {}
         for state_name, state_cfg in self._manifest.get("states", {}).items():
             frame_files = state_cfg.get("frames", [])
             if not frame_files:
@@ -39,6 +40,7 @@ class Sprite:
                 QPixmap(str(self.sprite_dir / filename))
                 for filename in frame_files
             ]
+            self._mirrored_frames[state_name] = [None] * len(self.frames[state_name])
 
         if not self.frames:
             raise ValueError("No valid animation states found in sprite.json")
@@ -83,6 +85,18 @@ class Sprite:
             return name
         return self._fallback_state if self._fallback_state in self.frames else self._first_state
 
+    def first_available_state(self, *names: str) -> str:
+        for name in names:
+            if name in self.frames:
+                return name
+        return self._fallback_state
+
+    def _actor_config(self) -> dict[str, Any]:
+        config = self._manifest.get("actor", {})
+        if not isinstance(config, dict):
+            return {}
+        return config
+
     def ambient_state(self) -> str:
         """Return the state the pet should be in based on the current hour."""
         hour = datetime.now().hour
@@ -102,8 +116,80 @@ class Sprite:
     def overlay(self) -> tuple[QPixmap | None, QPoint]:
         return self.statics["overlay"]["pixmap"], self.statics["overlay"]["pos"]
 
-    def current_frame(self) -> QPixmap:
-        return self.frames[self._state][self._frame_index]
+    def current_frame(self, facing_left: bool = False) -> QPixmap:
+        frame = self.frames[self._state][self._frame_index]
+        if not facing_left:
+            return frame
+
+        cached_frame = self._mirrored_frames[self._state][self._frame_index]
+        if cached_frame is not None:
+            return cached_frame
+
+        mirrored_frame = frame.transformed(QTransform().scale(-1, 1))
+        self._mirrored_frames[self._state][self._frame_index] = mirrored_frame
+        return mirrored_frame
+
+    def state_duration(self, name: str) -> float | None:
+        state_name = self._resolve(name)
+        state_config = self.states[state_name]
+        if state_config["loop"]:
+            return None
+
+        fps = state_config["fps"]
+        if fps <= 0:
+            return None
+
+        frame_count = len(self.frames[state_name])
+        return frame_count / fps
+
+    def shadow_box_config(self) -> dict[str, Any]:
+        config = self._manifest.get("shadow_box", {})
+        if not isinstance(config, dict):
+            return {}
+        return dict(config)
+
+    def starts_facing_right(self) -> bool:
+        actor_config = self._actor_config()
+        start_facing = str(actor_config.get("start_facing", "right")).lower()
+        return start_facing != "left"
+
+    def actor_y(self, frame: QPixmap | None = None) -> int:
+        actor_config = self._actor_config()
+        if "y" in actor_config:
+            return int(actor_config["y"])
+
+        if frame is None:
+            frame = self.current_frame()
+
+        max_y = max(0, self.height - frame.height())
+        default_y = max(0, self.height - frame.height() - 24)
+        return min(default_y, max_y)
+
+    def actor_bounds(self, frame: QPixmap | None = None) -> tuple[int, int]:
+        actor_config = self._actor_config()
+        bounds_config = actor_config.get("bounds", {})
+        if not isinstance(bounds_config, dict):
+            bounds_config = {}
+
+        if frame is None:
+            frame = self.current_frame()
+
+        max_x = max(0, self.width - frame.width())
+        min_x = int(bounds_config.get("left", actor_config.get("x", 24)))
+        max_bound = int(bounds_config.get("right", max_x - 24))
+
+        min_x = max(0, min(min_x, max_x))
+        max_bound = max(min_x, min(max_bound, max_x))
+        return min_x, max_bound
+
+    def actor_start_x(self, frame: QPixmap | None = None) -> int:
+        if frame is None:
+            frame = self.current_frame()
+
+        min_x, max_x = self.actor_bounds(frame)
+        actor_config = self._actor_config()
+        preferred_x = int(actor_config.get("x", min_x))
+        return max(min_x, min(preferred_x, max_x))
 
     def update(self, dt: float | None = None) -> None:
         if self._state not in self.frames:
