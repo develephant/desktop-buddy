@@ -33,8 +33,5 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: |
-            IMPORTANT: Never commit or push directly to the main branch.
-            Always create a new branch and open a pull request for any code
-            changes, even small ones. Leave a comment summarizing what you
-            did and linking the PR.
+          claude_args: |
+            --append-system-prompt "IMPORTANT: Never commit or push directly to the main branch. Always create a new branch and open a pull request for any code changes, even small ones. Leave a comment summarizing what you did and linking the PR."
