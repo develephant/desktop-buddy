@@ -39,7 +39,7 @@ See [BUILD_GUIDE.md](BUILD_GUIDE.md) for the full guide, including:
 
 ## Project layout
 
-```
+```text
 desktop-buddy/
 ├── pyproject.toml
 ├── uv.lock

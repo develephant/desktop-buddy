@@ -8,8 +8,8 @@ from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtGui import QMouseEvent, QPainter
 from PySide6.QtWidgets import QApplication, QMenu, QWidget
 
-from .animation import Animator
-from .sprite import Sprite
+from desktop_buddy.animation import Animator
+from desktop_buddy.sprite import Sprite
 
 
 class ToyWindow(QWidget):
@@ -122,9 +122,9 @@ class ToyWindow(QWidget):
     def contextMenuEvent(self, event) -> None:
         menu = QMenu(self)
         menu.addAction("Exit")
-        action = menu.exec(event.globalPosition().toPoint())
+        action = menu.exec(event.globalPos())
         if action and action.text() == "Exit":
-            self.close()
+            QApplication.quit()
 
 
 def main() -> None:

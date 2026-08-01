@@ -24,7 +24,7 @@ Frames are just numbered PNGs. Name them any way you like, but keep them sorted 
 
 Typical layout for a pet with one idle and one reaction:
 
-```
+```text
 src/desktop_buddy/sprites/my_pet/
 ├── sprite.json
 ├── base.png        # drawn behind the animated frame
@@ -90,7 +90,7 @@ Create a `sprite.json` next to your PNGs. Here is a full annotated example:
 ### Field reference
 
 | Field | Purpose |
-|---|---|
+| --- | --- |
 | `name` | Friendly name for the sprite. |
 | `width` | Window width and PNG width in pixels. |
 | `height` | Window height and PNG height in pixels. |
@@ -182,7 +182,7 @@ The output is `dist/DesktopBuddy/DesktopBuddy.exe`.
 ## Troubleshooting
 
 | Symptom | Fix |
-|---|---|
+| --- | --- |
 | `.exe` starts but no sprite appears | Verify you included `--add-data "src/desktop_buddy/sprites;desktop_buddy/sprites"` and that the PNGs are in the same relative layout as in `src/`. |
 | PNGs do not render | Try adding `--collect-all PySide6` to the PyInstaller command. This bundles all Qt plugins but makes the `.exe` larger. |
 | Command prompt flashes on launch | Add `--windowed --noconsole`. |
