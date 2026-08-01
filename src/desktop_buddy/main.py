@@ -109,13 +109,16 @@ class ToyWindow(QWidget):
             delta = (event.pos() - self._press_pos).manhattanLength()
             if not self._dragging and delta > self._drag_threshold:
                 self._dragging = True
+                self.sprite.set_state("drag")
             if self._dragging:
                 new_pos = event.globalPosition().toPoint() - self._drag_offset
                 self.move(new_pos)
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.LeftButton:
-            if not self._dragging:
+            if self._dragging:
+                self.sprite.reset()
+            else:
                 self.sprite.set_state("happy")
             self._dragging = False
 
