@@ -9,8 +9,15 @@ dependencies = [
     "PySide6>=6.8",
 ]
 
+[project.optional-dependencies]
+studio = [
+    "gradio>=5",
+    "pillow>=10",
+]
+
 [project.scripts]
 desktop-buddy = "desktop_buddy.main:main"
+desktop-buddy-studio = "desktop_buddy.studio.app:main"
 
 [build-system]
 requires = ["hatchling"]

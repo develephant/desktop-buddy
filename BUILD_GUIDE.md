@@ -8,6 +8,19 @@ This guide explains how to draw a sprite, hook it into `desktop-buddy`, test it,
 - An image editor that exports transparent PNGs, e.g. GIMP, Aseprite, Photoshop, or Paint.NET
 - (Optional) An icon file if you want a custom `.exe` icon
 
+## 0. Or use the Create-A-Buddy Studio
+
+Don't want to hand-craft PNGs and JSON in an external editor? The repo ships an optional Gradio-based Studio app that lets you draw frames, manage states, and export a ready-to-run sprite folder from a browser UI.
+
+```powershell
+uv sync --extra studio
+uv run desktop-buddy-studio
+```
+
+It covers steps 1 and 2 below for you: draw each frame on a square canvas (32/64/128/256 px presets), organize frames into states (idle, happy, sleep, ...), preview the animation, and export directly into `src/desktop_buddy/sprites/<name>/` (or download a zip). The Studio is dev tooling only — it is not bundled into the `.exe` build in step 4.
+
+If you'd rather draw sprites by hand in an external image editor, or want to understand the `sprite.json` format the Studio generates, continue with step 1.
+
 ## 1. Design your art
 
 Every sprite lives in its own folder under `src/desktop_buddy/sprites/`. The default folder is a good template.
