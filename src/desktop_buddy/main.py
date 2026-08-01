@@ -1,5 +1,6 @@
 import argparse
 import random
+import signal
 import sys
 import time
 
@@ -137,6 +138,12 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     window = ToyWindow(args.sprite)
+
+    def _sigint_handler(signum, frame) -> None:
+        app.quit()
+
+    signal.signal(signal.SIGINT, _sigint_handler)
+
     try:
         sys.exit(app.exec())
     except KeyboardInterrupt:
