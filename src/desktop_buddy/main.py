@@ -1,4 +1,5 @@
 import argparse
+import random
 import sys
 import time
 
@@ -42,6 +43,7 @@ class ToyWindow(QWidget):
         self._hour_timer.timeout.connect(self._on_hour)
         self._hour_timer.start(60 * 60 * 1000)
         self._on_hour()
+        self._schedule_excitement()
 
         screen = QApplication.primaryScreen().availableGeometry()
         self.move(
@@ -59,6 +61,16 @@ class ToyWindow(QWidget):
             self.sprite.default_state = new_state
             if self.sprite.state == old_state:
                 self.sprite.set_state(new_state)
+
+    def _schedule_excitement(self) -> None:
+        """Queue a random burst of excitement."""
+        QTimer.singleShot(random.randint(5000, 15000), self._maybe_get_excited)
+
+    def _maybe_get_excited(self) -> None:
+        """Trigger the excited state if the pet is currently idle."""
+        if self.sprite.state == "idle":
+            self.sprite.set_state("excited")
+        self._schedule_excitement()
 
     def _tick(self) -> None:
         now = time.monotonic()

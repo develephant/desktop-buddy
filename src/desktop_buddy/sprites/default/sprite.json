@@ -11,7 +11,12 @@
   "states": {
     "idle": {
       "frames": ["idle_0.png", "idle_1.png", "idle_2.png", "idle_3.png"],
+      "fps": 2,
       "loop": true
+    },
+    "excited": {
+      "frames": ["excited_0.png", "excited_1.png", "excited_2.png", "excited_3.png"],
+      "loop": false
     },
     "happy": {
       "frames": ["happy_0.png", "happy_1.png", "happy_2.png", "happy_3.png"],

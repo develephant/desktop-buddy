@@ -7,6 +7,7 @@ A drop-in sprite desktop pal built with PySide6. Add your own PNG frames to a sp
 - Transparent, frameless, always-on-top window
 - Drag the toy around the desktop
 - Click to trigger a reaction animation
+- Random excited outbursts while idle
 - Animated states plus static base/overlay layers
 - Time-aware ambient states (idle, sleep, nap) that update every hour
 - Right-click menu to exit
