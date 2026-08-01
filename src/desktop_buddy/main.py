@@ -137,7 +137,10 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     window = ToyWindow(args.sprite)
-    sys.exit(app.exec())
+    try:
+        sys.exit(app.exec())
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
