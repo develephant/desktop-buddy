@@ -145,6 +145,89 @@ uv run desktop-buddy --sprite my_pet
 
 If something is missing, the app exits with a clear error (e.g., missing `sprite.json` or a frame file it cannot find).
 
+### Shadow-box variant
+
+The repo also ships a separate shadow-box build for wider, shelf-like scenes. It keeps the original desktop toy unchanged and adds a horizontal stage where the character can:
+
+- idle
+- walk
+- run
+- fall while the box is dragged
+- hurt when the sprite is clicked
+
+Run it with:
+
+```powershell
+uv run desktop-buddy-shadow-box --sprite my_shadow_box
+```
+
+For this build, make the window art wide rather than square and add an `actor` section so the sprite knows where it lives inside the box:
+
+```json
+{
+  "name": "my_shadow_box",
+  "width": 400,
+  "height": 200,
+  "default_state": "idle",
+  "actor": {
+    "x": 44,
+    "y": 72,
+    "start_facing": "right",
+    "bounds": {
+      "left": 44,
+      "right": 280
+    }
+  },
+  "shadow_box": {
+    "walk_speed": 42,
+    "run_speed": 92,
+    "idle_seconds": [1.5, 4.0],
+    "walk_seconds": [2.5, 5.0],
+    "run_seconds": [0.9, 1.8]
+  },
+  "states": {
+    "idle": {
+      "frames": ["idle_0.png", "idle_1.png"],
+      "loop": true
+    },
+    "walk": {
+      "frames": ["walk_0.png", "walk_1.png", "walk_2.png", "walk_3.png"],
+      "fps": 6,
+      "loop": true
+    },
+    "run": {
+      "frames": ["run_0.png", "run_1.png", "run_2.png", "run_3.png"],
+      "fps": 10,
+      "loop": true
+    },
+    "fall": {
+      "frames": ["fall_0.png", "fall_1.png"],
+      "fps": 8,
+      "loop": true
+    },
+    "hurt": {
+      "frames": ["hurt_0.png", "hurt_1.png", "hurt_2.png"],
+      "fps": 10,
+      "loop": false
+    }
+  },
+  "statics": {
+    "base": {
+      "image": "shadow_box_back.png",
+      "x": 0,
+      "y": 0
+    },
+    "overlay": {
+      "image": "shadow_box_front.png",
+      "x": 0,
+      "y": 0
+    }
+  }
+}
+```
+
+`width` and `height` define the rectangle of the whole display, not just the sprite frame size. `statics.base` and `statics.overlay` are a good fit for your back-wall art and foreground trim. If you have not drawn the final PNG yet, the app paints a simple fallback curio box so you can still tune animation and movement first.
+
 ## 4. Package a standalone `.exe`
 
 Install PyInstaller:

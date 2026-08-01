@@ -17,6 +17,7 @@ studio = [
 
 [project.scripts]
 desktop-buddy = "desktop_buddy.main:main"
+desktop-buddy-shadow-box = "desktop_buddy.shadow_box:main"
 desktop-buddy-studio = "desktop_buddy.studio.app:main"
 
 [build-system]
