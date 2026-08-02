@@ -323,8 +323,9 @@ class ShadowBoxWindow(QWidget):
             return
 
         self._dragging = False
-        self._press_pos = event.pos()
-        self._press_on_sprite = self._is_sprite_hit(event.pos())
+        press_pos = event.position().toPoint()
+        self._press_pos = press_pos
+        self._press_on_sprite = self._is_sprite_hit(press_pos)
         self._drag_offset = (
             event.globalPosition().toPoint() - self.frameGeometry().topLeft()
         )
@@ -333,7 +334,8 @@ class ShadowBoxWindow(QWidget):
         if not event.buttons() & Qt.LeftButton:
             return
 
-        distance = (event.pos() - self._press_pos).manhattanLength()
+        current_pos = event.position().toPoint()
+        distance = (current_pos - self._press_pos).manhattanLength()
         if not self._dragging and distance > self._drag_threshold:
             self._dragging = True
             self._hurt_remaining = 0.0
@@ -354,13 +356,13 @@ class ShadowBoxWindow(QWidget):
             self._queue_behavior("idle")
             return
 
-        if self._press_on_sprite and self._is_sprite_hit(event.pos()):
+        if self._press_on_sprite and self._is_sprite_hit(event.position().toPoint()):
             self._begin_hurt()
 
     def contextMenuEvent(self, event) -> None:
         menu = QMenu(self)
         menu.addAction("Exit")
-        action = menu.exec(event.globalPos())
+        action = menu.exec(event.globalPosition().toPoint())
         if action and action.text() == "Exit":
             QApplication.quit()
 

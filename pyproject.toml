@@ -26,3 +26,8 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/desktop_buddy"]
+
+[tool.uv.workspace]
+members = [
+    "src/desktop_buddy/studio",
+]

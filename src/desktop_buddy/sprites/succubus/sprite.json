@@ -1,0 +1,50 @@
+{
+  "name": "shadow_box",
+  "width": 400,
+  "height": 200,
+  "fps": 8,
+  "default_state": "idle",
+  "actor": {
+    "x": 44,
+    "y": 50,
+    "start_facing": "right",
+    "bounds": {
+      "left": 44,
+      "right": 228
+    }
+  },
+  "shadow_box": {
+    "walk_speed": 44,
+    "run_speed": 88,
+    "idle_seconds": [1.5, 3.6],
+    "walk_seconds": [2.4, 4.4],
+    "run_seconds": [1.2, 2.9]
+  },
+  "states": {
+    "idle": {
+      "frames": ["idle_00.png", "idle_01.png", "idle_02.png", "idle_03.png", "idle_04.png", "idle_05.png", "idle_06.png", "idle_07.png"],
+      "fps": 8,
+      "loop": true
+    },
+    "walk": {
+      "frames": ["walk_00.png", "walk_01.png", "walk_02.png", "walk_03.png", "walk_04.png", "walk_05.png", "walk_06.png", "walk_07.png", "walk_08.png", "walk_09.png"],
+      "fps": 7,
+      "loop": true
+    },
+    "run": {
+      "frames": ["excited_00.png", "excited_01.png", "excited_02.png", "excited_03.png", "excited_04.png", "excited_05.png"],
+      "fps": 7,
+      "loop": true
+    },
+    "fall": {
+      "frames": ["fall_00.png", "fall_01.png", "fall_02.png"],
+      "fps": 3,
+      "loop": true
+    },
+    "hurt": {
+      "frames": ["hurt_00.png", "hurt_01.png", "hurt_02.png", "hurt_03.png"],
+      "fps": 9,
+      "loop": true
+    }
+  }
+}

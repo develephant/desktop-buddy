@@ -422,7 +422,11 @@ def build_app() -> gr.Blocks:
 
 def main() -> None:
     demo = build_app()
-    demo.launch()
+    demo.launch(
+        server_name="0.0.0.0",
+        server_port=7861,
+        footer_links=[]
+    )
 
 
 if __name__ == "__main__":

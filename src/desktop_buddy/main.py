@@ -99,14 +99,14 @@ class ToyWindow(QWidget):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.LeftButton:
             self._dragging = False
-            self._press_pos = event.pos()
+            self._press_pos = event.position().toPoint()
             self._drag_offset = (
                 event.globalPosition().toPoint() - self.frameGeometry().topLeft()
             )
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
         if event.buttons() & Qt.LeftButton:
-            delta = (event.pos() - self._press_pos).manhattanLength()
+            delta = (event.position().toPoint() - self._press_pos).manhattanLength()
             if not self._dragging and delta > self._drag_threshold:
                 self._dragging = True
                 self.sprite.set_state("drag")
@@ -125,7 +125,7 @@ class ToyWindow(QWidget):
     def contextMenuEvent(self, event) -> None:
         menu = QMenu(self)
         menu.addAction("Exit")
-        action = menu.exec(event.globalPos())
+        action = menu.exec(event.globalPosition().toPoint())
         if action and action.text() == "Exit":
             QApplication.quit()
 
