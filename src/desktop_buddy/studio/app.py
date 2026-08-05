@@ -26,87 +26,82 @@ def on_create_project(buddy_name: str, buddy_type: str, canvas_size: str) -> tup
             buddy_type=buddy_type,
         )
         
-        msg = f"✓ Created '{name}' ({buddy_type}, {size}x{size})"
-        return project, msg, gr.update(interactive=True)
+        msg = f"OK: Created '{name}' ({buddy_type}, {size}x{size})"
+        return project, msg
     except Exception as exc:
-        return SpriteProject(), f"✗ Error: {exc}", gr.update(interactive=False)
+        return SpriteProject(), f"Error: {exc}"
 
 
 def on_detect_states(folder_path: str) -> tuple:
     """Scan folder for state subfolders."""
     try:
         if not folder_path:
-            return [], "⚠ Select a folder first."
+            return [], "Select a folder first."
         
         states = sprite_io.auto_detect_states(folder_path)
         if not states:
-            return [], "⚠ No state subfolders found. Expected: idle/, walk/, happy/, etc."
+            return [], "No state subfolders found. Expected: idle/, walk/, happy/, etc."
         
-        msg = f"✓ Found {len(states)} state(s): {', '.join(states)}"
+        msg = f"Found {len(states)} state(s): {', '.join(states)}"
         return states, msg
     except Exception as exc:
-        return [], f"✗ Error: {exc}"
+        return [], f"Error: {exc}"
 
 
 def on_import_states(project: SpriteProject, folder_path: str, detected_states: list) -> tuple:
     """Import animation frames from folder structure."""
     try:
         if not folder_path:
-            return project, "⚠ Select a folder first."
+            return project, "Select a folder first."
         
         if not detected_states:
-            return project, "⚠ No states to import. Detect states first."
+            return project, "No states to import. Detect states first."
         
         results = sprite_io.import_from_folder(project, folder_path)
         
         state_list = "\n".join(
-            f"  • {state}: {count} frame(s)"
+            f"  - {state}: {count} frame(s)"
             for state, count in sorted(results.items())
         )
-        msg = f"✓ Imported:\n{state_list}"
+        msg = f"Imported:\n{state_list}"
         
-        state_names = list(project.states.keys())
-        return (
-            project,
-            msg,
-            gr.update(choices=state_names, value=state_names[0] if state_names else None),
-        )
+        return project, msg
     except Exception as exc:
-        return project, f"✗ Error: {exc}", gr.update(choices=[])
+        return project, f"Error: {exc}"
 
 
 def on_set_state_fps(project: SpriteProject, state_name: str, fps: float | None) -> tuple:
     """Set FPS for a state."""
     try:
         if not state_name or state_name not in project.states:
-            return project, "⚠ Select a state first."
+            return project, "Select a state first."
         
         project.states[state_name].fps = fps
-        msg = f"✓ Set FPS for '{state_name}' to {fps or 'default'}."
+        msg = f"Set FPS for '{state_name}' to {fps or 'default'}."
         return project, msg
     except Exception as exc:
-        return project, f"✗ Error: {exc}"
+        return project, f"Error: {exc}"
 
 
 def on_set_state_loop(project: SpriteProject, state_name: str, loop: bool) -> tuple:
     """Set loop toggle for a state."""
     try:
         if not state_name or state_name not in project.states:
-            return project, "⚠ Select a state first."
+            return project, "Select a state first."
         
         project.states[state_name].loop = loop
         loop_text = "loop enabled" if loop else "no loop"
-        msg = f"✓ Set '{state_name}' to {loop_text}."
+        msg = f"Set '{state_name}' to {loop_text}."
         return project, msg
     except Exception as exc:
-        return project, f"✗ Error: {exc}"
+        return project, f"Error: {exc}"
 
 
 def on_preview_state(project: SpriteProject, state_name: str) -> tuple:
     """Generate animated preview GIF for a state."""
     try:
         if not state_name or state_name not in project.states:
-            return None, "⚠ Select a state first."
+            return None, "Select a state first."
         
         state = project.states[state_name]
         fps = state.fps or project.fps or 8.0
@@ -118,7 +113,7 @@ def on_preview_state(project: SpriteProject, state_name: str) -> tuple:
             frames.append(frame_copy)
         
         if not frames:
-            return None, "⚠ No frames in this state."
+            return None, "No frames in this state."
         
         tmp = tempfile.NamedTemporaryFile(suffix=".gif", delete=False)
         frames[0].save(
@@ -130,17 +125,17 @@ def on_preview_state(project: SpriteProject, state_name: str) -> tuple:
             disposal=2,
         )
         
-        msg = f"▶ Previewing '{state_name}' at {fps:g} fps ({len(frames)} frame(s))."
+        msg = f"Preview: '{state_name}' at {fps:g} fps ({len(frames)} frame(s))."
         return tmp.name, msg
     except Exception as exc:
-        return None, f"✗ Error: {exc}"
+        return None, f"Error: {exc}"
 
 
 def on_set_background(project: SpriteProject, bg_type: str, image) -> tuple:
     """Set day or night background."""
     try:
         if image is None:
-            return project, "⚠ Select an image first."
+            return project, "Select an image first."
         
         if isinstance(image, dict):
             image = image.get("composite") or image.get("background")
@@ -154,17 +149,17 @@ def on_set_background(project: SpriteProject, bg_type: str, image) -> tuple:
             y=project.backgrounds[bg_type].y,
         )
         
-        msg = f"✓ Set {bg_type} background."
+        msg = f"Set {bg_type} background."
         return project, msg
     except Exception as exc:
-        return project, f"✗ Error: {exc}"
+        return project, f"Error: {exc}"
 
 
 def on_set_foreground(project: SpriteProject, image) -> tuple:
     """Set foreground layer."""
     try:
         if image is None:
-            return project, "⚠ Select an image first."
+            return project, "Select an image first."
         
         if isinstance(image, dict):
             image = image.get("composite") or image.get("background")
@@ -178,10 +173,10 @@ def on_set_foreground(project: SpriteProject, image) -> tuple:
             y=project.foreground.y,
         )
         
-        msg = "✓ Set foreground layer."
+        msg = "Set foreground layer."
         return project, msg
     except Exception as exc:
-        return project, f"✗ Error: {exc}"
+        return project, f"Error: {exc}"
 
 
 def on_set_icon(project: SpriteProject, icon_type: str, image) -> tuple:
@@ -189,7 +184,7 @@ def on_set_icon(project: SpriteProject, icon_type: str, image) -> tuple:
     try:
         if image is None:
             project.icons[icon_type] = None
-            msg = f"✓ Cleared {icon_type} icon."
+            msg = f"Cleared {icon_type} icon."
             return project, msg
         
         if isinstance(image, dict):
@@ -198,31 +193,31 @@ def on_set_icon(project: SpriteProject, icon_type: str, image) -> tuple:
         img_path = image if isinstance(image, str) else str(image)
         project.icons[icon_type] = img_path
         
-        msg = f"✓ Set {icon_type} icon."
+        msg = f"Set {icon_type} icon."
         return project, msg
     except Exception as exc:
-        return project, f"✗ Error: {exc}"
+        return project, f"Error: {exc}"
 
 
-def on_export_sprite(project: SpriteProject) -> tuple:
+def on_export_sprite(project: SpriteProject) -> str:
     """Export project as sprite.json + PNGs."""
     try:
         if not project.states:
-            return "⚠ No states to export. Import assets first.", gr.update()
+            return "No states to export. Import assets first."
         
         sprite_dir = sprite_io.export_sprite(project)
-        msg = f"✓ Exported to `{sprite_dir}`\n\nRun with:\n`uv run desktop-buddy --sprite {project.name}`"
+        msg = f"Exported to {sprite_dir}\n\nRun with:\nuv run desktop-buddy --sprite {project.name}"
         
-        return msg, gr.update(choices=sprite_io.list_sprites())
+        return msg
     except Exception as exc:
-        return f"✗ Export failed: {exc}", gr.update()
+        return f"Export failed: {exc}"
 
 
 def on_export_zip(project: SpriteProject) -> tuple:
     """Package as downloadable ZIP."""
     try:
         if not project.states:
-            return None, "⚠ No states to export."
+            return None, "No states to export."
         
         data = sprite_io.export_zip(project)
         tmp = tempfile.NamedTemporaryFile(suffix=".zip", delete=False)
@@ -230,11 +225,11 @@ def on_export_zip(project: SpriteProject) -> tuple:
         tmp.close()
         
         frame_count = sum(len(s.frames) for s in project.states.values())
-        msg = f"✓ ZIP ready ({len(project.states)} state(s), {frame_count} frame(s))."
+        msg = f"ZIP ready ({len(project.states)} state(s), {frame_count} frame(s))."
         
         return tmp.name, msg
     except Exception as exc:
-        return None, f"✗ Error: {exc}"
+        return None, f"Error: {exc}"
 
 
 def build_app() -> gr.Blocks:
@@ -242,7 +237,7 @@ def build_app() -> gr.Blocks:
 
     with gr.Blocks(title="Desktop Buddy Studio") as demo:
         gr.Markdown(
-            "# 🐾 Desktop Buddy Studio\n"
+            "# Buddy Studio\n"
             "Create animation sequences from organized asset folders."
         )
 
@@ -276,7 +271,7 @@ def build_app() -> gr.Blocks:
                 create_btn.click(
                     on_create_project,
                     inputs=[buddy_name_tb, buddy_type_radio, canvas_size_dd],
-                    outputs=[project_state, setup_status, gr.update()],
+                    outputs=[project_state, setup_status],
                 )
 
             # TAB 2: Asset Import
@@ -285,7 +280,7 @@ def build_app() -> gr.Blocks:
                     "**2. Point to a folder with state subfolders**\n\n"
                     "Expected structure:\n"
                     "```\n"
-                    "/path/assets/\n"
+                    "assets/\n"
                     "  idle/\n"
                     "    frame_0.png\n"
                     "    frame_1.png\n"
@@ -328,7 +323,7 @@ def build_app() -> gr.Blocks:
                 import_btn.click(
                     on_import_states,
                     inputs=[project_state, folder_path_tb, detected_states],
-                    outputs=[project_state, import_status, gr.update()],
+                    outputs=[project_state, import_status],
                 )
 
             # TAB 3: Configuration
@@ -462,25 +457,25 @@ def build_app() -> gr.Blocks:
                 apply_small_btn.click(
                     lambda p, img: on_set_icon(p, "small", img),
                     inputs=[project_state, small_icon],
-                    outputs=[project_state, gr.update()],
+                    outputs=[project_state],
                 )
                 
                 apply_medium_btn.click(
                     lambda p, img: on_set_icon(p, "medium", img),
                     inputs=[project_state, medium_icon],
-                    outputs=[project_state, gr.update()],
+                    outputs=[project_state],
                 )
                 
                 apply_large_btn.click(
                     lambda p, img: on_set_icon(p, "large", img),
                     inputs=[project_state, large_icon],
-                    outputs=[project_state, gr.update()],
+                    outputs=[project_state],
                 )
                 
                 export_btn.click(
                     on_export_sprite,
                     inputs=[project_state],
-                    outputs=[export_status, gr.update()],
+                    outputs=[export_status],
                 )
                 
                 download_btn.click(
