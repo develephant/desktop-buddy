@@ -71,6 +71,42 @@ class Sprite:
             else:
                 self.statics[layer] = {"pixmap": None, "pos": QPoint(0, 0)}
 
+        self.buddy_type = self._manifest.get("buddy_type", "static")
+
+        self.backgrounds: dict[str, dict[str, Any]] = {}
+        for bg_type in ("day", "night"):
+            cfg = self._manifest.get("backgrounds", {}).get(bg_type)
+            if cfg:
+                image = cfg.get("image")
+                pixmap = QPixmap(str(self.sprite_dir / image)) if image else None
+                self.backgrounds[bg_type] = {
+                    "pixmap": pixmap,
+                    "pos": QPoint(int(cfg.get("x", 0)), int(cfg.get("y", 0))),
+                }
+            else:
+                self.backgrounds[bg_type] = {"pixmap": None, "pos": QPoint(0, 0)}
+
+        self.foreground: dict[str, Any] = {}
+        fg_cfg = self._manifest.get("foreground")
+        if fg_cfg:
+            image = fg_cfg.get("image")
+            pixmap = QPixmap(str(self.sprite_dir / image)) if image else None
+            self.foreground = {
+                "pixmap": pixmap,
+                "pos": QPoint(int(fg_cfg.get("x", 0)), int(fg_cfg.get("y", 0))),
+            }
+        else:
+            self.foreground = {"pixmap": None, "pos": QPoint(0, 0)}
+
+        self.icons: dict[str, str | None] = {}
+        for icon_type in ("small", "medium", "large"):
+            icon_filename = self._manifest.get("icons", {}).get(icon_type)
+            if icon_filename:
+                icon_path = self.sprite_dir / icon_filename
+                self.icons[icon_type] = str(icon_path) if icon_path.is_file() else None
+            else:
+                self.icons[icon_type] = None
+
         self._state = self.default_state
         self._frame_index = 0
         self._accumulator = 0.0
@@ -115,6 +151,21 @@ class Sprite:
 
     def overlay(self) -> tuple[QPixmap | None, QPoint]:
         return self.statics["overlay"]["pixmap"], self.statics["overlay"]["pos"]
+
+    def background(self, bg_type: str = "day") -> tuple[QPixmap | None, QPoint]:
+        """Get background layer (day or night)."""
+        if bg_type not in self.backgrounds:
+            bg_type = "day"
+        bg = self.backgrounds[bg_type]
+        return bg["pixmap"], bg["pos"]
+
+    def foreground_layer(self) -> tuple[QPixmap | None, QPoint]:
+        """Get foreground layer."""
+        return self.foreground["pixmap"], self.foreground["pos"]
+
+    def icon_path(self, icon_type: str = "medium") -> str | None:
+        """Get icon file path (small, medium, or large)."""
+        return self.icons.get(icon_type)
 
     def current_frame(self, facing_left: bool = False) -> QPixmap:
         frame = self.frames[self._state][self._frame_index]

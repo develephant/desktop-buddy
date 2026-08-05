@@ -28,6 +28,4 @@ build-backend = "hatchling.build"
 packages = ["src/desktop_buddy"]
 
 [tool.uv.workspace]
-members = [
-    "src/desktop_buddy/studio",
-]
+members = []
