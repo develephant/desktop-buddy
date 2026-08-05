@@ -33,10 +33,18 @@ class SpriteProject:
     height: int = 128
     fps: float = DEFAULT_FPS
     default_state: str = "idle"
+    buddy_type: str = "static"
     time_states: dict[str, list[int]] = field(default_factory=dict)
     states: dict[str, StateData] = field(default_factory=dict)
     statics: dict[str, StaticLayer] = field(
         default_factory=lambda: {"base": StaticLayer(), "overlay": StaticLayer()}
+    )
+    backgrounds: dict[str, StaticLayer] = field(
+        default_factory=lambda: {"day": StaticLayer(), "night": StaticLayer()}
+    )
+    foreground: StaticLayer = field(default_factory=StaticLayer)
+    icons: dict[str, str | None] = field(
+        default_factory=lambda: {"small": None, "medium": None, "large": None}
     )
 
     @property
@@ -116,6 +124,7 @@ class SpriteProject:
             "width": self.width,
             "height": self.height,
             "fps": self.fps,
+            "buddy_type": self.buddy_type,
             "default_state": self.default_state,
             "states": {
                 state_name: {
@@ -138,5 +147,28 @@ class SpriteProject:
         }
         if statics_manifest:
             manifest["statics"] = statics_manifest
+
+        backgrounds_manifest = {
+            bg_name: {"image": f"{bg_name}.png", "x": bg.x, "y": bg.y}
+            for bg_name, bg in self.backgrounds.items()
+            if bg.image is not None
+        }
+        if backgrounds_manifest:
+            manifest["backgrounds"] = backgrounds_manifest
+
+        if self.foreground.image is not None:
+            manifest["foreground"] = {
+                "image": "foreground.png",
+                "x": self.foreground.x,
+                "y": self.foreground.y,
+            }
+
+        icons_manifest = {
+            icon_name: f"{icon_name}.png"
+            for icon_name, icon_path in self.icons.items()
+            if icon_path is not None
+        }
+        if icons_manifest:
+            manifest["icons"] = icons_manifest
 
         return manifest
